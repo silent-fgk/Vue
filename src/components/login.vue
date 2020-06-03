@@ -46,7 +46,7 @@
                         </el-form-item>
                         <el-form-item prop="code" class="code">
                             <el-input autocomplete="off" placeholder="输入验证码" v-model="registerForm.code"></el-input>
-                            <el-button>获取验证码</el-button>
+                            <el-button @click="reqCode()" type="primary">{{this.code}}</el-button>
                         </el-form-item>
                     </el-form>
                     <div class="popups-btn">
@@ -111,6 +111,8 @@
             let code = (rule,value,callback) => {
                 if (value === ''){
                     callback(new Error('请输入验证码'))
+                }else {
+                    callback();
                 }
             };
             return{
@@ -152,12 +154,15 @@
                     code:[
                         {validator:code,trigger:'blur'}
                     ]
-                }
+                },
+
+                code:'获取验证码'
             }
         },
         mounted() {
         },
         methods:{
+            /* 判断进入状态 0 为登录  1位注册*/
             login(id){
                 this.popupActive = true;
                 this.loginActive = id;
@@ -166,21 +171,8 @@
                 }else if (this.loginActive === 1){
                     this.text = '前往登录';
                 }
-               /* this.$axios.get('/search',{
-                    headers:{
-                        withCredentials: true
-                    },
-                    params:{
-                        keywords:this.keywords
-                    }
-                })
-                .then((res)=>{
-                    console.log(res)
-                })
-                .catch((err)=>{
-                    console.log(err)
-                })*/
             },
+            /*切换登录注册*/
             active(loginActive,registerForm,loginForm){
                 if (loginActive === 0){
                     this.loginActive = 1;
@@ -196,9 +188,22 @@
             req(registerForm,loginForm){
                 if ( this.loginActive === 0){
                     this.$refs[loginForm].validate((valid) =>{
-                        if (valid){
-                            console.log(valid)
-                            console.log(this.loginForm);
+                        if (valid === true){
+                            this.$axios.post('/api/login/cellphone',{
+                                headers:{
+                                    withCredentials: true
+                                },
+                                params:{
+                                    phone:this.loginForm.phone,
+                                    password:this.loginForm.pwd
+                                }
+                            })
+                            .then((res)=>{
+                                console.log(res)
+                            })
+                            .catch((error)=>{
+                                console.log(error);
+                            })
                         }else {
                             return false
                         }
@@ -208,7 +213,7 @@
                     this.$refs[registerForm].validate((valid) =>{
                         if (valid){
                             console.log(valid);
-
+                            console.log(this.registerForm);
                         }else {
                             return false
                         }
@@ -221,6 +226,35 @@
                 this.$refs[registerForm].resetFields();
                 this.$refs[loginForm].resetFields();
             },
+            reqCode(){
+               /* this.$refs.registerForm.validate("phone",(valid) =>{
+                    if (valid){
+                        console.log(valid);
+                    }else {
+                        return false
+                    }
+                });*/
+                if (this.registerForm.phone === '' || this.registerForm.phone.length !== 11){
+                    console.log('输入不能为空');
+                    this.code = "60s";
+                }else {
+                    this.$axios.get('/api/captcha/sent',{
+                        headers:{
+                            withCredentials: true
+                        },
+                        params:{
+                            phone:this.registerForm.phone
+                        }
+                    })
+                    .then((res)=>{
+
+                        console.log(res);
+                    })
+                    .catch((error)=>{
+                        console.log(error);
+                    })
+                }
+            }
         }
 
     }

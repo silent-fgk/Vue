@@ -1,22 +1,10 @@
 module.exports = {
-    /*devServer:{
-        open:true,
-        proxy:{
-            "/api":{
-                target:"",
-                changeOrigin: true,
-                pathRewrite:{
-                    "^/api":"/"
-                }
-            }
-        }
-    }*/
+
     devServer: {
         open:true,
         proxy: {
             '/api': {
-                target: 'https://music.163.com/',
-                ws:true,
+                target: 'http://localhost:3000/',
                 changeOrigin: true,
                 pathRewrite:{
                     '^/api':'/'
