@@ -10,21 +10,24 @@
                 </div>
             </el-header>
             <el-container>
-                <el-aside width="100px" class="aside">Aside</el-aside>
+                <el-aside width="200px" class="aside">Aside</el-aside>
                 <el-container>
                     <el-main class="main-box">
-                        <ul>
-                            <li></li>
-                        </ul>
+                        <div class="list-box">
+                            <ul>
+                                <li v-for="item in musicList" :key="item.id">
+                                    {{item.name}}
+                                </li>
+                            </ul>
+                        </div>
                         <div class="block">
                             <el-pagination
-                                    @size-change="handleSizeChange"
                                     @current-change="handleCurrentChange"
                                     :current-page="currentPage"
-                                    :page-sizes="10"
-                                    :page-size="10"
-                                    layout="sizes, prev, pager, next, jumper"
-                                    :total="400">
+                                    :page-sizes="[30]"
+                                    :page-size="30"
+                                    layout="total, prev, pager, next, jumper"
+                                    :total="this.total">
                             </el-pagination>
                         </div>
                     </el-main>
@@ -54,7 +57,10 @@
         data(){
             return{
                 search:'',//搜索框
-                currentPage:1
+                currentPage:1,
+                total:0,
+
+                musicList:[]
             }
         },
         methods:{
@@ -71,19 +77,33 @@
                         }
                     })
                         .then((res)=>{
-                            console.log(res)
+                            this.musicList = res.data.result.songs;
+                            this.total = res.data.result.songCount;
+                            console.log(res);
                         })
                         .catch((err)=>{
                             console.log(err)
                         })
                 }
             },
-
-            handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
-            },
             handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
+                this.$axios.get('/api/search',{
+                    headers:{
+                        withCredentials: true
+                    },
+                    params:{
+                        keywords:this.search,
+                        offset:(val -1)*30
+                    }
+                })
+                    .then((res)=>{
+                        this.musicList = res.data.result.songs;
+                        this.total = res.data.result.songCount;
+                        console.log(res);
+                    })
+                    .catch((err)=>{
+                        console.log(err)
+                    })
             }
         }
     }
@@ -113,7 +133,19 @@
             .aside{
             }
             .main-box{
-                height:600px;
+                height:750px;
+                .list-box{
+                    text-align: left;
+
+                }
+                .list-box ul>li{
+                    list-style-type: none;
+                    user-select: none;
+                }
+                .list-box ul>li:hover{
+                    cursor: pointer;
+                    color: #ffffff;
+                }
             }
         }
 

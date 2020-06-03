@@ -1,5 +1,5 @@
 <template>
-    <div class="footer">
+    <div class="Footers">
         <div id="time-box">
             <el-progress :stroke-width="2"
                          :percentage="percentage"
@@ -20,7 +20,7 @@
 
 <script>
     export default {
-        name: "footer",
+        name: "Footers",
         data(){
             return{
                 percentage:0,//时间长度
@@ -57,7 +57,7 @@
 </script>
 
 <style scoped lang="scss">
-    .footer{
+    .Footers{
         display: flex;
         #time-box{
             padding-top:13px;
