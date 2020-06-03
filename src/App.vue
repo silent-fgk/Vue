@@ -16,5 +16,8 @@
 </script>
 
 <style>
-
+    body{
+        background-image:url("../src/assets/img/bg.jpg");
+        background-size: cover;
+    }
 </style>

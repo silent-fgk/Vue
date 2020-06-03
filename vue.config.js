@@ -1,8 +1,5 @@
-/*
-const path = require('path');
-
 module.exports = {
-    devServer:{
+    /*devServer:{
         open:true,
         proxy:{
             "/api":{
@@ -13,5 +10,18 @@ module.exports = {
                 }
             }
         }
+    }*/
+    devServer: {
+        open:true,
+        proxy: {
+            '/api': {
+                target: 'https://music.163.com/',
+                ws:true,
+                changeOrigin: true,
+                pathRewrite:{
+                    '^/api':'/'
+                }
+            }
+        }
     }
-};*/
+};
