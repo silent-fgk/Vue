@@ -13,22 +13,24 @@
                 <el-aside width="200px" class="aside">Aside</el-aside>
                 <el-container>
                     <el-main class="main-box">
-                        <div class="list-box">
-                            <ul>
-                                <li v-for="item in musicList" :key="item.id">
-                                    {{item.name}}
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="block">
-                            <el-pagination
-                                    @current-change="handleCurrentChange"
-                                    :current-page="currentPage"
-                                    :page-sizes="[30]"
-                                    :page-size="30"
-                                    layout="total, prev, pager, next, jumper"
-                                    :total="this.total">
-                            </el-pagination>
+                        <div v-show="listState">
+                            <div class="list-box">
+                                <ul>
+                                    <li v-for="item in musicList" :key="item.id" @dblclick="getPlayUrl(item.id)">
+                                        {{item.name}}
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="block">
+                                <el-pagination
+                                        @current-change="handleCurrentChange"
+                                        :current-page="currentPage"
+                                        :page-sizes="[30]"
+                                        :page-size="30"
+                                        layout="total, prev, pager, next, jumper"
+                                        :total="this.total">
+                                </el-pagination>
+                            </div>
                         </div>
                     </el-main>
 
@@ -36,7 +38,7 @@
 
             </el-container>
             <el-footer>
-                <Footers></Footers>
+                <Footers :playUrl="this.playUrl" ref="footers"></Footers>
             </el-footer>
         </el-container>
     </div>
@@ -60,7 +62,10 @@
                 currentPage:1,
                 total:0,
 
-                musicList:[]
+                listState:false,
+                musicList:[],
+
+                playUrl:""
             }
         },
         methods:{
@@ -76,14 +81,14 @@
                             keywords:this.search
                         }
                     })
-                        .then((res)=>{
-                            this.musicList = res.data.result.songs;
-                            this.total = res.data.result.songCount;
-                            console.log(res);
-                        })
-                        .catch((err)=>{
-                            console.log(err)
-                        })
+                    .then((res)=>{
+                        this.musicList = res.data.result.songs;
+                        this.total = res.data.result.songCount;
+                        this.listState = true;
+                    })
+                    .catch((err)=>{
+                        console.log(err)
+                    })
                 }
             },
             handleCurrentChange(val) {
@@ -96,14 +101,31 @@
                         offset:(val -1)*30
                     }
                 })
-                    .then((res)=>{
-                        this.musicList = res.data.result.songs;
-                        this.total = res.data.result.songCount;
-                        console.log(res);
-                    })
-                    .catch((err)=>{
-                        console.log(err)
-                    })
+                .then((res)=>{
+                    this.musicList = res.data.result.songs;
+                    this.total = res.data.result.songCount;
+                })
+                .catch((err)=>{
+                    console.log(err)
+                })
+            },
+            getPlayUrl(id){
+                this.$axios.get('/api/song/url',{
+                    headers:{
+                      withCredentials:true
+                    },
+                    params:{
+                        id:id
+                    }
+                })
+                .then((res)=>{
+                    this.playUrl = res.data.data[0].url;
+                    this.$refs.footers.playMusic();
+                    console.log(this.playUrl);
+                })
+                .catch((error)=>{
+                    console.log(error);
+                })
             }
         }
     }
