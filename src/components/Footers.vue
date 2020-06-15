@@ -34,7 +34,7 @@
             }
         },
         mounted() {
-
+            console.log(this.$store.state.name);
         },
         methods:{
             format(percentage) {

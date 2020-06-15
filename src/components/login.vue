@@ -44,9 +44,28 @@
                         <el-form-item prop="checkPwd">
                             <el-input type="password" placeholder="确认密码" autocomplete="off" v-model="registerForm.checkPwd"></el-input>
                         </el-form-item>
-                        <el-form-item prop="code" class="code">
-                            <el-input autocomplete="off" placeholder="输入验证码" v-model="registerForm.code"></el-input>
-                            <el-button @click="reqCode()" type="primary">{{this.code}}</el-button>
+                        <el-form-item prop="code">
+                            <div class="code">
+                                <el-input autocomplete="off" placeholder="输入验证码" v-model="registerForm.code"></el-input>
+                                <el-button @click="reqCode()" type="primary" style="">
+                                    <span v-show="!this.code">获取验证码</span>
+                                    <div class="count-down" v-show="this.code">
+                                         <countDown :time="this.time"
+                                                    :scale="true"
+                                                    :hours="false"
+                                                    :minutes="false"
+                                                    color="#fff"
+                                                    backgroundColor=""
+                                                    borderColor="none"
+                                                    unitEn
+                                         >
+
+                                         </countDown>
+                                    </div>
+
+                                </el-button>
+                            </div>
+
                         </el-form-item>
                     </el-form>
                     <div class="popups-btn">
@@ -62,8 +81,12 @@
 </template>
 
 <script>
+    import countDown from "./countDown";
     export default {
         name: "login",
+        components:{
+            countDown
+        },
         data(){
             /*登录表单校验规则*/
             let loginPhone = (rule,value,callback) => {
@@ -156,7 +179,8 @@
                     ]
                 },
 
-                code:'获取验证码'
+                code:false,
+                time:null,
             }
         },
         mounted() {
@@ -236,7 +260,8 @@
                 });*/
                 if (this.registerForm.phone === '' || this.registerForm.phone.length !== 11){
                     console.log('输入不能为空');
-                    this.code = "60s";
+                    this.code = true;
+                    this.time =60;
                 }else {
                     this.$axios.get('/api/captcha/sent',{
                         headers:{
@@ -291,11 +316,13 @@
             }
             .code{
                 display: flex;
-                .el-input{
-                    width: 67%;
-                }
                 .el-button{
+                    width: 40%;
                     margin-left: 5px;
+                    .count-down{
+                        display: flex;
+                        justify-content: center;
+                    }
                 }
             }
             .popups-btn{
